@@ -1,51 +1,67 @@
-#include<EEPROM.h>
+#include <EEPROM.h>
 int buttonPin = 7;
 int ledPin = 9;
-boolean on;
+int led_status;
 int buttonState = 0;
 
 int buttonPushCounter = 0;
 int lastButtonState = 0;
 int lastPress = 0;
-uint8_t EEPROMaddress = 130;
-  
-void setup() {
-  pinMode(ledPin,OUTPUT);
-  pinMode(buttonPin,INPUT);
-  Serial.begin(9600);
+uint8_t EEPROMaddress = 1;
+
+void setup()
+{
+    pinMode(ledPin, OUTPUT);
+    pinMode(buttonPin, INPUT);
+    led_status = EEPROM.read(EEPROMaddress); 
+    Serial.begin(9600);
 }
 
-void loop() {
-  lastPress = EEPROM.read(EEPROMaddress);
-  buttonState = digitalRead(buttonPin);
+void _light()
+{
+  if(led_status == 1)
+  {
+    _sw_on();
+  }else
+  {
+    _sw_off();
+  }
+}
 
-  if(on == true){
-    lastPress = on;
-    EEPROM.write(EEPROMaddress,lastPress);
-    }
-    else if(on == false){
-    lastPress = on;
-    EEPROM.write(EEPROMaddress,lastPress);
-    }
-  
-  if(buttonState == HIGH){
-      buttonPushCounter++;
-      Serial.println("on");
-      Serial.print("number of button pushes:  ");
-      Serial.println(buttonPushCounter);
-    if(on==true){
-        on = false;
-      }else{
-        on = true;
-      }
-    }
+void _switch()
+{   
+    buttonState = digitalRead(buttonPin);
     
-    if(on == true){
-        digitalWrite(ledPin,HIGH);
-      }
-      else{
-        digitalWrite(ledPin,LOW);
-      }
+    if (buttonState == HIGH)
+    {
 
-        delay(200);
+         if (led_status == 1)
+         {
+             led_status = 0;
+             EEPROM.write(EEPROMaddress, led_status);
+             _sw_off();
+         }
+         else
+         {
+             led_status = 1;
+             EEPROM.write(EEPROMaddress, led_status);
+             _sw_on();
+         }
+         delay(500);
+    }
 }
+
+void _sw_on(){
+  digitalWrite(ledPin, HIGH);
+}
+
+void _sw_off(){
+  digitalWrite(ledPin, LOW);
+}
+
+void loop()
+{
+    _light();
+    _switch();
+}
+
