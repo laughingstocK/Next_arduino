@@ -4,9 +4,6 @@ int ledPin = 9;
 int led_status;
 int buttonState = 0;
 
-int buttonPushCounter = 0;
-int lastButtonState = 0;
-int lastPress = 0;
 uint8_t EEPROMaddress = 1;
 
 void setup()
